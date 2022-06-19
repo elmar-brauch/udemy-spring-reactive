@@ -50,7 +50,7 @@ class PetStoreServiceTest {
 	}
 	
 	@Test
-	void reactiveTest() throws InterruptedException {
+	void requestPetsReactiveTest() throws InterruptedException {
 		Disposable petsRead = service.requestAvailablePetsReactive()
 				.subscribe(p -> pets.add(p));
 		assertTrue(pets.size() < 5);

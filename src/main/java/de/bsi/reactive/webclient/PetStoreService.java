@@ -43,7 +43,7 @@ public class PetStoreService {
 				.bodyValue(requestBody)
 				.retrieve()
 				.bodyToMono(Pet.class)
-				.doOnSuccess(pet -> log.info("Pet with id {} received.", pet.id()))
+				.doOnSuccess(pet -> log.info("Service received Pet with id {}.", pet.id()))
 				.block();
 	}
 	
@@ -67,7 +67,7 @@ public class PetStoreService {
 				.takeLast(5)
 				.doOnEach(signal -> {
 					if (signal.hasValue())
-						log.info("Pet {} received.", signal.get().name());
+						log.info("Service received {}.", signal.get().name());
 				});
 	}
 	
