@@ -47,7 +47,7 @@ class PetStoreControllerTest {
 	@Test
 	void monoWithPetstoreTest() {
 		var disposable = client.post()
-				.uri(PetStoreController.URL_PATH_REAL)
+				.uri(PetStoreController.URL_PATH_STORE)
 				.bodyValue(Pet.createPet("Hansi"))
 				.retrieve()
 				.bodyToMono(Pet.class)
@@ -74,7 +74,7 @@ class PetStoreControllerTest {
 	@Test
 	void fluxWithPetstoreTest() {
 		var disposable = client.get()
-				.uri(PetStoreController.URL_PATH_REAL)
+				.uri(PetStoreController.URL_PATH_STORE)
 				.retrieve()
 				.bodyToFlux(Pet.class)
 				.subscribe(pet -> {
