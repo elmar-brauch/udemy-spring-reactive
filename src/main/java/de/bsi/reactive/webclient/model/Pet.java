@@ -13,14 +13,14 @@ import java.util.UUID;
  *    "status":"available"
  *  }
  */
-public record Pet(Long id, String name, List<String> photoUrls, String status) {
+public record Pet(String id, String name, List<String> photoUrls, String status) {
 	
 	public static Pet createPet(String name) {
 		return new Pet(null, name, List.of(), null);
 	}
 	
 	public static Pet createAvailablePetWithRandomId(String name) {
-		long id = UUID.randomUUID().getMostSignificantBits();
+		String id = "" + UUID.randomUUID().getMostSignificantBits();
 		return new Pet(id, name, List.of(), "available");
 	}
 	
