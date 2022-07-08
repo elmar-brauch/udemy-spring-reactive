@@ -24,7 +24,7 @@ public class PetStoreController {
 	static final String URL_PATH_DUMMY = "/pet/dummy";
 	static final String URL_PATH_STORE = "/pet/store";
 
-	@Autowired private PetStoreService service;
+	@Autowired private PetStoreService apiService;
 	
 	@ResponseStatus(HttpStatus.CREATED)
 	@PostMapping(URL_PATH_DUMMY)
@@ -39,7 +39,7 @@ public class PetStoreController {
 	@ResponseStatus(HttpStatus.CREATED)
 	@PostMapping(URL_PATH_STORE)
 	public Mono<Pet> createPet(@RequestBody final Pet newPet) {
-		Mono<Pet> result = service.createPetReactive(newPet.name());
+		Mono<Pet> result = apiService.createPetReactive(newPet.name());
 		log.info("Thread does not wait.");
 		return result;
 	}
@@ -58,7 +58,7 @@ public class PetStoreController {
 	@GetMapping(path = URL_PATH_STORE,
 			produces = MediaType.APPLICATION_NDJSON_VALUE)
 	public Flux<Pet> findAvailablePets() {
-		return service.requestAvailablePetsReactive()
+		return apiService.requestAvailablePetsReactive()
 				.doOnComplete(() -> log.info("Server completed Flux."));
 	}
 	
@@ -71,4 +71,5 @@ public class PetStoreController {
 		log.info("Server created {}.", name);
 		return Pet.createAvailablePetWithRandomId(name);	
 	}
+	
 }
