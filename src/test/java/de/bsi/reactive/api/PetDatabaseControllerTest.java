@@ -17,8 +17,10 @@ import org.springframework.web.reactive.function.client.WebClient;
 import de.bsi.reactive.db.PetRepository;
 import de.bsi.reactive.db.model.PetDAO;
 import de.bsi.reactive.webclient.model.Pet;
+import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Flux;
 
+@Slf4j
 @SpringBootTest(webEnvironment = WebEnvironment.DEFINED_PORT)
 class PetDatabaseControllerTest {
 
@@ -47,16 +49,20 @@ class PetDatabaseControllerTest {
 	
 	@Test
 	void sendFluxWithWebClientToDatabaseTest() {
-		var requestStream = Stream.generate(() -> Pet.createPet(PET_NAME_1)).limit(5);
-		var requestFlux = Flux.fromStream(requestStream).delayElements(Duration.ofSeconds(1));
+		var requestStream = Stream
+				.generate(() -> Pet.createPet(PET_NAME_1))
+				.limit(5);
+		var requestFlux = Flux.fromStream(requestStream)
+				.delayElements(Duration.ofSeconds(1));
 		
 		var responseFlux = client.post()
 				.contentType(MediaType.APPLICATION_NDJSON)
 				.body(requestFlux, Pet.class)
 				.retrieve()
-				.bodyToFlux(Pet.class);
+				.bodyToFlux(Pet.class)
+				.doOnNext(p -> log.info("Stored Pet received from server."));
 				
 		assertTrue(responseFlux.all(p -> PET_NAME_1.equals(p.name())).block());
 	}
-
+	
 }
