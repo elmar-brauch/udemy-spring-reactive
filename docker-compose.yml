@@ -1,6 +1,6 @@
 services:
   native-application:
-    image: "udemy-spring-reactive:1.1"
+    image: "udemy-spring-reactive:1.2"
     ports:
       - "8080:8080"
     environment:
