@@ -1,12 +1,17 @@
 package de.bsi.reactive.webclient;
 
+import java.time.Duration;
+import java.util.function.Predicate;
+
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 import de.bsi.reactive.webclient.model.Pet;
 import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.util.retry.Retry;
 
 @Service
 @Slf4j
@@ -30,7 +35,7 @@ public class PetStoreService {
 		return client.get()
 				.uri(PETSTORE_QUERY_URL, STATUS_AVAILABLE)
 				.exchangeToMono(response -> {
-					log.info("Response code: {}", response.rawStatusCode());
+					log.info("Response code: {}", response.statusCode());
 					return response.bodyToMono(Pet[].class);
 				}).block();
 	}
@@ -47,6 +52,10 @@ public class PetStoreService {
 				.block();
 	}
 	
+	private Predicate<Throwable> isRetryable = 
+			t -> t instanceof WebClientResponseException responseEx 
+			&& responseEx.getStatusCode().is5xxServerError();
+	
 	public Mono<Pet> createPetReactive(String name) {
 		var requestBody = Pet.createAvailablePetWithRandomId(name);
 
@@ -55,6 +64,8 @@ public class PetStoreService {
 				.bodyValue(requestBody)
 				.retrieve()
 				.bodyToMono(Pet.class)
+				.retryWhen(Retry.backoff(3, Duration.ofSeconds(1))
+						.filter(isRetryable))
 				.doOnSuccess(pet -> log.info(
 						"Pet with id {} created.", pet.id()));
 	}
